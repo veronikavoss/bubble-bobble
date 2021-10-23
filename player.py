@@ -50,10 +50,10 @@ class Player(pygame.sprite.Sprite):
     
     def set_input(self):
         self.key_input=pygame.key.get_pressed()
-        if self.key_input[pygame.K_LEFT]:
+        if self.key_input[pygame.K_LEFT] and not self.collide_ceiling:
             self.dx=-self.move_speed
             self.directicollide_right=False
-        elif self.key_input[pygame.K_RIGHT]:
+        elif self.key_input[pygame.K_RIGHT] and not self.collide_ceiling:
             self.dx=self.move_speed
             self.directicollide_right=True
         else:
@@ -75,15 +75,12 @@ class Player(pygame.sprite.Sprite):
                     self.rect.left=tile.rect.right
                     self.collide_left=True
                     self.current_x=self.rect.left
-                elif self.dx>0 and self.jumped==False:
+                elif self.dx>0:
                 # elif self.dx>0 and self.rect.left<tile.rect.left:
                     self.rect.right=tile.rect.left
                     self.collide_right=True
                     self.current_x=self.rect.right
                     
-                elif self.dx>0 and self.rect.right>tile.rect.left:
-                    self.rect.right=tile.rect.left
-                    self.current_x=self.rect.right
         
         if self.collide_left and (self.rect.left<self.current_x or self.dx>=0):
             self.collide_left=False
@@ -102,20 +99,16 @@ class Player(pygame.sprite.Sprite):
                     self.rect.bottom=tile.rect.top
                     self.dy=0
                     self.jumped=False
-                if self.rect.top<tile.rect.bottom and self.dy!=0:
+                elif self.rect.top<tile.rect.bottom and self.dy!=0:
                     # self.rect.top=tile.rect.bottom
                     # self.dy=0
-                    
                     self.collide_ceiling=True
-                    self.current_x=self.rect.x
-                    self.dx=0
+                    self.action='ceiling'
         
         if self.jumped==False and self.dy<0 or self.dy>1:
             self.jumped=True
         if self.collide_ceiling and self.dy>0:
             self.collide_ceiling=False
-        if self.collide_ceiling and self.collide_right:
-            self.rect.x=self.current_x
     
     def get_action(self):
         if self.dy<0:
@@ -163,6 +156,7 @@ class Player(pygame.sprite.Sprite):
         self.get_action()
         self.animation()
         
+        print(self.action)
         # print(self.jumped,self.action,self.current_x,self.rect.left)
         # print(
         #     'l:',self.collide_left,
